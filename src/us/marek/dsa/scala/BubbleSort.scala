@@ -2,6 +2,12 @@ package us.marek.dsa.scala
 
 import scala.util.Random
 
+/**
+ * Note that this is a particularly naive implementation - it does N^2 comparisons instead of the
+ * theoretically optimal N*(N-1)/2, but it's functional, concise, and of course still O(N^2).
+ * A future implementation will include the optimization to N*(N-1)/2 comparisons.
+ */
+
 object BubbleSort extends App {
   
   val randomList = createRandomData(10)
