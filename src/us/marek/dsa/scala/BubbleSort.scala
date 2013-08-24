@@ -9,8 +9,8 @@ object BubbleSort extends App {
   printf("Sorted list (bubble sort):\n%s", bubbleSort(randomList))
  
   def createRandomData(numEl: Int) = Array.fill(numEl)(Random.nextDouble).toList
-  def sort(a: List[Double], b: List[Double]) = if (a.last <  b(0)) a ++ b else a.init ++ b ++ List(a.last)
-  def bubbleStep(l: List[Double]) = l.sliding(1).reduceLeft(sort)   
+  def sort(a: List[Double], b: Double) = if (a.last <  b) a ++ List(b) else a.init ++ List(b) ++ List(a.last)
+  def bubbleStep(l: List[Double]) = l.sliding(1).reduceLeft((a,b) => sort(a, b(0)))   
   def bubbleSort(l: List[Double]) = l.foldLeft(l)((a,b) => bubbleStep(a))
  
 
