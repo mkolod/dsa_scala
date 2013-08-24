@@ -16,7 +16,8 @@ object BubbleSort extends App {
 
   def bubbleSort(l: List[Double], unsortedElems: Int): List[Double] = unsortedElems match {
     
-      case i:Int if (i > 1) => bubbleSort(bubbleStep(l.take(unsortedElems)), unsortedElems - 1) ++ l.drop(unsortedElems)
+      case i:Int if (i > 1) => 
+        bubbleSort(bubbleStep(l.take(unsortedElems)), unsortedElems - 1) ++ l.drop(unsortedElems)
       case _ => l
     }
 }
