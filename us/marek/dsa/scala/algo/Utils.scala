@@ -1,4 +1,6 @@
-package us.marek.dsa.scala
+package us.marek.dsa.scala.algo
+
+import scala.util.Random
 
 /**
  * 

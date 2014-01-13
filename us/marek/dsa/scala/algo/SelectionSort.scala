@@ -1,10 +1,5 @@
-package us.marek.dsa.scala
+package us.marek.dsa.scala.algo
 
-import scala.util.Random
-
-/**
- * 
- */
 object SelectionSort extends App {
   
   val randomList = Utils.createRandomData(10)

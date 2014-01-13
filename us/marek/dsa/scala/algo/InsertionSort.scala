@@ -1,8 +1,5 @@
-package us.marek.dsa.scala
+package us.marek.dsa.scala.algo
 
-/**
- * 
- */
 object InsertionSort extends App {
 
   val randomList = Utils.createRandomData(10)
