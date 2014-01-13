@@ -116,24 +116,10 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
      until it appears in the adjacency hash table*/
   def addVertex(v: Vertex[T]) = adjHash.put(v, LinkedHashSet.empty[Edge[T, S]])
   
-  
-  // to do - delete vertex !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  /*
-  def deleteVertex[S](v: Vertex[T]) = {
-    require(adjHash.contains(v), "Can't delete a non-existent vertex from adjacency hash")
-    for (e <- adjHash.get(v).get) {
-      val a = adjHash(e.to)
-      val x = Edge[T, S](e.to, e.from)
-      if (a.contains(x)) {
-        a.remove(x)
-      }
-        
-    }
-    numVert -= 1
-  }
-  * 
-  */
+  /////////////////////////////////////////////////////////////////////////////
+  // to do - delete vertex !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+  ////////////////////////////////////////////////////////////////////////////
+ 
 
   def addUndirectedEdge(a: Vertex[T], b: Vertex[T], equiWeight: S) = {
     addDirectedEdge(a, b, equiWeight)
