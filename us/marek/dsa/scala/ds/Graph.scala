@@ -48,7 +48,7 @@ object Graph extends App {
    the correct data structure (in Dijkstra's case, 
    path will matter, too)
  */
-sealed abstract trait GraphCollection[T] {
+sealed trait GraphCollection[T] {
   def add(t: T): Unit
   def remove: Option[T]
   def peek: Option[T]
