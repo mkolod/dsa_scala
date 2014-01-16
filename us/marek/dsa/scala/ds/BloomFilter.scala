@@ -3,7 +3,7 @@ package us.marek.dsa.scala.ds
 import scala.collection.mutable.BitSet
 import scala.io.Source
 import math.{exp, log, pow, round}
-  // get enum values (Space, FalsePosRate)
+
 
 object BloomFilter extends App {
   
