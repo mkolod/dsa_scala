@@ -12,15 +12,13 @@ object Graph extends App {
   // some test data 
   
   val graph = new Graph[String, Option[Int]]() {
-    "A,B,C,D,E,F,G,H,I".split(",").foreach(s => addVertex(s))
-    addUndirectedEdge("A", "B", None)  // we don't care about the weights for now, so weights = None
-    addUndirectedEdge("B", "F", None)
-    addUndirectedEdge("F", "H", None)
-    addUndirectedEdge("A", "C", None)
-    addUndirectedEdge("A", "D", None)
-    addUndirectedEdge("D", "G", None)
-    addUndirectedEdge("G", "I", None)
-    addUndirectedEdge("A", "E", None)
+    "A,B,C,D,E,F,G".split(",").foreach(s => addVertex(s))
+    addDirectedEdge("A", "B", None)  // we don't care about the weights for now, so weights = None
+    addDirectedEdge("B", "D", None)
+    addDirectedEdge("B", "E", None)
+    addDirectedEdge("A", "C", None)
+    addDirectedEdge("C", "F", None)
+    addDirectedEdge("F", "G", None)
   }
   
   /* test depth-first and breadth-first search, so far, the implementation
@@ -34,6 +32,7 @@ object Graph extends App {
   
   println("\nBreadth-first search\n")
   graph.breadthFirstSearch(start, f)
+  println(graph.topoSort)
 } // end object Graph
 
 
@@ -116,10 +115,57 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
      until it appears in the adjacency hash table*/
   def addVertex(v: Vertex[T]) = adjHash.put(v, LinkedHashSet.empty[Edge[T, S]])
   
-  /////////////////////////////////////////////////////////////////////////////
-  // to do - delete vertex !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
-  ////////////////////////////////////////////////////////////////////////////
+  
+  def minSpanningTree() = {
+    
+  }
+  
+  def topoSort: List[Vertex[T]] = {
+    
+    val remaining = HashSet[Vertex[T]]() ++ adjHash.keySet
+    val sorted = LinkedHashSet[Vertex[T]]()
+   
+    println(adjHash)
+    
+    def nodesWithNoSuccessors = remaining.filter(x => adjHash(x).isEmpty) match { 
+      case x if x.isEmpty => {println(x); None}
+      case x => Some(x)
+    }
+   
+    
+    while (!(remaining.size == 0)) {
+     val x = nodesWithNoSuccessors
+     println(s"sorted = $sorted")
+     println(s"remaining = $remaining\n")
+     if (x == None) throw new IllegalStateException("Graph has cycles - nodes remain yet there's no node without successors")
+     val next = x.get.take(1)
+     sorted ++= next
+     remaining --= next
+    }
+    sorted.toList
+  }
  
+  
+  def deleteVertex(vert: Vertex[T]) = {
+    require(adjHash.contains(vert), "Can't delete a nonexistent node")
+    val outgoing = adjHash.get(vert).get
+    // for (i <- outgoing) yield i
+    for (i <- outgoing) {
+      val incoming = adjHash.get(i.to)
+      if (incoming != None) {
+        incoming.get.remove(Edge(i.to, vert))
+      }
+    }
+    adjHash.remove(vert)  
+  }
+  
+  def deleteEdge(from: Vertex[T], to: Vertex[T]): Boolean = {
+    require(adjHash.contains(from), "can't delete edge if the start node doesn't exist")
+    require(adjHash.get(from).getOrElse(None) == None, "can't delete edge since the start node doesn't have any connections")
+    val edge = new Edge[T, S](from, to, None)
+    require(adjHash.get(from).get.contains(edge), s"Can't delete an edge between $from and $to since it doesn't exit")
+    adjHash.get(from).get.remove(edge)
+  }
 
   def addUndirectedEdge(a: Vertex[T], b: Vertex[T], equiWeight: S) = {
     addDirectedEdge(a, b, equiWeight)
