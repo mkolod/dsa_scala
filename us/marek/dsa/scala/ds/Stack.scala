@@ -20,7 +20,7 @@ class Stack[T : Manifest](maxSize: Int) {
   }
   
   def peek = if (isEmpty) throw new StackUnderflowError("Stack underflow") else arr(currentSize - 1)
-  
+    
   def isEmpty = currentSize == 0
   def isFull = currentSize == maxSize  
   def size = currentSize
