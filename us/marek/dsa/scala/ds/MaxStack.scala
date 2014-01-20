@@ -5,6 +5,35 @@ package us.marek.dsa.scala.ds
 import java.util.EmptyStackException
 
 /**
+ * Demo - see below for the MaxStack class
+ */
+object MaxStack extends App {
+  
+  val stack = new MaxStack[Int](10)
+  
+  println("\nMaxStack test\n")
+  
+  for (i <- Seq(3, 2, 1, 6, 7, 9, 5, 8, 4, 0)) {
+    stack.push(i)
+    println(s"Pushed $i, top of the stack =  ${stack.peek}, current max = ${stack.getMax}, current size = ${stack.size}")
+  }
+  
+  println(s"\n$stack\n")
+  
+  for (i <- 1 to 10) {
+    val popped = stack.pop
+    print(s"Popped $popped")
+    if (!stack.isEmpty) {
+      println(s", top of stack = ${stack.peek}, current max = ${stack.getMax}, current size = ${stack.size}")
+    } else {
+      println(s", stack is empty, current size = ${stack.size}")
+    }
+  }
+  
+}
+
+
+/**
  * Stack with O(1) push(), pop() and getMax()
  * 
  * @param maxSize - maximum size of the stack
@@ -64,31 +93,5 @@ class MaxStack[T <% Ordered[T]](val maxSize: Int) {
   def isEmpty: Boolean = position == -1
   def isFull: Boolean = position == maxSize - 1
   override def toString = s"MaxStack(${arr.map(_.t).mkString(",")}) (top on the right)"
-  
-}
-
-
-object MaxStack extends App {
-  
-  val stack = new MaxStack[Int](10)
-  
-  println("\nMaxStack test\n")
-  
-  for (i <- Seq(3, 2, 1, 6, 7, 9, 5, 8, 4, 0)) {
-    stack.push(i)
-    println(s"Pushed $i, top of the stack =  ${stack.peek}, current max = ${stack.getMax}, current size = ${stack.size}")
-  }
-  
-  println(s"\n$stack\n")
-  
-  for (i <- 1 to 10) {
-    val popped = stack.pop
-    print(s"Popped $popped")
-    if (!stack.isEmpty) {
-      println(s", top of stack = ${stack.peek}, current max = ${stack.getMax}, current size = ${stack.size}")
-    } else {
-      println(s", stack is empty, current size = ${stack.size}")
-    }
-  }
   
 }
