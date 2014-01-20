@@ -54,10 +54,7 @@ object FindMedian {
          */
         recPart(left, pivotIdx - 1, n)
       } else {
-        /* If n is larger than the pivot index, look in the right subarray, since
-         * the pivot index indicates that there are fewer than n elements smaller
-         * than the pivot
-         */
+        // If n is larger than the pivot index, look in the right subarray
         recPart(pivotIdx + 1, right, n)
       }
     }
@@ -65,6 +62,8 @@ object FindMedian {
     val len = arr.length
     /* If the array length is odd, pick the middle element
      * Return a list since in the even case we will be returning two elements
+     * so we need to keep the return type consistent without risking its
+     * generalization to Any.
      */
     if (len % 2 == 1) {
       List(recPart(0, len - 1, len / 2))
@@ -78,10 +77,15 @@ object FindMedian {
   }
 
   /**
-   * @param items
-   * @param left
-   * @param right
-   * @param piv
+   * Method to partition the array (just like in Quicksort)
+   * This is one implementation of the algorithm
+   * (<a href="http://en.wikipedia.org/wiki/Quickselect">Wikipedia version</a>).
+   * There are others, e.g. with the left and right indices moving towards the center, e.g.
+   * <a href="http://www.scala-lang.org/docu/files/ScalaByExample.pdf">here</a>.
+   * @param items array to be partitioned
+   * @param left left index of the subarray to be partitioned
+   * @param right right index of the subarray to be partitioned
+   * @param piv index of the pivot's original position
    */
   private def partition[K <% Ordered[K]](items: Array[K], left: Int, right: Int, piv: Int): Int = {
 
@@ -99,7 +103,7 @@ object FindMedian {
     for (i <- (left to right - 1)) {
       if (items(i) < pivVal) {
         if (i != idx) swap(i, idx)
-        idx = idx + 1
+        idx += 1
       }
     }
     swap(idx, right)
