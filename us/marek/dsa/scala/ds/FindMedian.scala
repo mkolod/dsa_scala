@@ -3,12 +3,16 @@ package us.marek.dsa.scala.ds
 import scala.annotation.tailrec
 
 /**
- *  Demo - main
+ *  Find the median value of an array in O(n) time (includes demo)
  */
 object FindMedian {
 
+  /**
+   * main method for demo
+   */
   def main(args: Array[String]): Unit = {
 
+    // print array contents
     def prettyPrint[T](a: Array[T]) = s"Array(${a.mkString(",")})"
 
     val arr1 = Array(1, 5, 4, 3, 2)
@@ -17,9 +21,18 @@ object FindMedian {
     println(s"Array 2 (even length): ${prettyPrint(arr2)}, median = ${median(arr2)}")
   }
 
-  def median[T <% Ordered[T]](arr: Array[T]) = {
+  /**
+   * find median of an array in O(n) time
+   * 
+   * @param arr Array[T] where T can be viewed as Ordered[T]
+   */
+  def median[T <% Ordered[T]](arr: Array[T]): List[T] = {
 
-    @tailrec
+    /**
+     * recursive partitioning - the core of the QuickSelect algorithm
+     * @param 
+     */
+    @tailrec   
     def recPart(left: Int, right: Int, n: Int): T = {
       if (left == right) return arr(left)
       val pivotIdx = partition(arr, left, right, (left + right) / 2)
