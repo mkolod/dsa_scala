@@ -2,7 +2,7 @@ package us.marek.dsa.scala.ds
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import HashUtils.{md5, sha1, sha256}
+import HashUtils.{md5, sha1, sha256, murmurHash3}
 import HashType._
 
 object HashTable extends App {
@@ -17,7 +17,18 @@ case class HashTable[T](hashSize: Int, hashType: HashType = HashCode) {
   
   val arr = Array.fill(hashSize)(new ArrayBuffer[T]())
   
-  def findArr[T](t: T) = arr(math.abs(md5(t) % hashSize)) // or t.hashCode
+  def findArr[T](t: T) = {
+    
+    val hash = hashType match {
+      case HashCode => t.hashCode
+      case MD5 => md5(t)
+      case SHA1 => sha1(t)
+      case SHA256 => sha256(t)
+      case MurmurHash3 => murmurHash3(t)
+    }
+    
+    arr(math.abs(hash % hashSize)) // or t.hashCode
+  }
   
   def add(t: T) = {
     val ll = findArr(t)
