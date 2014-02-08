@@ -27,7 +27,7 @@ case class HashTable[T](hashSize: Int, hashType: HashType = HashCode) {
       case MurmurHash3 => murmurHash3(t)
     }
     
-    arr(math.abs(hash % hashSize)) // or t.hashCode
+    arr(math.abs(hash % hashSize)) 
   }
   
   def add(t: T) = {
