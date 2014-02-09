@@ -23,8 +23,8 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
     if (x < currentSize) Some(x) else None
   }
 
-  def checkOverflow() = {
-    if (currentSize + 1 == arr.length) {
+  def checkCapacity() = {
+    if (currentSize == arr.length) {
       resize()
     }
   }
@@ -38,9 +38,11 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
   }
 
   def insert(t: T) = {
-    checkOverflow()
+    checkCapacity()
     arr(currentSize) = t
+    println(arr.toList)
     trickleUp()
+    println(arr.toList + "\n")
     currentSize += 1
   }
 
@@ -52,13 +54,13 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
       var lc = leftChild(current)
       var rc = rightChild(current)
       val child = (lc, rc) match {
-        case (Some(x), Some(y)) => Some(if (x > y) x else y)
-        case (Some(x), None) => Some(x)
-        case (None, Some(y)) => Some(y)
-        case (None, None) => {println(s"lc=$lc, rc=$rc"); None}
+        case (Some(x), Some(y)) => Some(if (arr(x) > arr(y)) lc.get else rc.get)
+        case (Some(x), None) => Some(lc.get)
+        case (None, Some(y)) => Some(rc.get)
+        case (None, None) => None
       }
       if (child != None && arr(child.get) > arr(current)) {
-        arr(current) = arr(child.get)
+        swap(current, child.get)
         current = child.get
       } else {
         arr(current) = temp
@@ -66,21 +68,22 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
       }
     }
   }
+  
+  def swap(i: Int, j: Int) = {
+    val temp = arr(i)
+    arr(i) = arr(j)
+    arr(j) = temp
+  }
 
   def trickleUp() = {
-    println("trickleUp")
     var current = currentSize
     var par = parent(current)
-    val temp = arr(current)
     while (par != None && arr(par.get) < arr(current)) {
-      println("criterion")
-      arr(current) = arr(par.get)
+      println(s"In while, par=$par, arr(par.get)=${arr(par.get)}, arr(current)=${arr(current)}")
+      swap(par.get, current)
       current = par.get
-      par = parent(par.get)
+      par = parent(current)
     }
-    arr(current) = temp
-    println(arr.toList)
-
   }
 
   def remove(): T = {
@@ -98,10 +101,9 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
 object MinHeap extends App {
   val mh = new MinHeap[Int]()
   (1 to 10).foreach(mh.insert)
-  println(mh.arr.toList)
-//  while (!mh.isEmpty) {
-//    println(mh.remove)
- // }
+  while (!mh.isEmpty) {
+    println(mh.remove)
+  }
 
 }
 
