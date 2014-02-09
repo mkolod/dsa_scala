@@ -61,7 +61,6 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
         swap(current, child.get)
         current = child.get
       } else {
-        arr(current) = temp
         current = -1
       }
     }
@@ -77,7 +76,6 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
     var current = currentSize
     var par = parent(current)
     while (par != None && arr(par.get) > arr(current)) {
-      println(s"In while, par=$par, arr(par.get)=${arr(par.get)}, arr(current)=${arr(current)}")
       swap(par.get, current)
       current = par.get
       par = parent(current)
