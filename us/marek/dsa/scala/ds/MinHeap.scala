@@ -8,28 +8,28 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
   private var currentSize = 0
   private var arr = new Array[T](initialSize)
 
-  def parent(i: Int) = {
+  private def parent(i: Int) = {
     val x = (i - 1) / 2
     if (x >= 0) Some(x) else None
   }
 
-  def leftChild(i: Int) = {
+  private def leftChild(i: Int) = {
     val x = 2 * i + 1
     if (x < currentSize) Some(x) else None
   }
 
-  def rightChild(i: Int) = {
+  private def rightChild(i: Int) = {
     val x = 2 * i + 2
     if (x < currentSize) Some(x) else None
   }
 
-  def checkCapacity() = {
+  private def checkCapacity() = {
     if (currentSize == arr.length) {
       resize()
     }
   }
 
-  def resize() = {
+  private def resize() = {
     val temp = new Array[T](math.max(1, arr.size) * 2)
     for (i <- 0 until currentSize) {
       temp(i) = arr(i)
@@ -40,13 +40,11 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
   def insert(t: T) = {
     checkCapacity()
     arr(currentSize) = t
-    println(arr.toList)
     trickleUp()
-    println(arr.toList + "\n")
     currentSize += 1
   }
 
-  def trickleDown() = {
+  private def trickleDown() = {
     var current = 0
     val temp = arr(current)
 
@@ -69,13 +67,13 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
     }
   }
   
-  def swap(i: Int, j: Int) = {
+  private def swap(i: Int, j: Int) = {
     val temp = arr(i)
     arr(i) = arr(j)
     arr(j) = temp
   }
 
-  def trickleUp() = {
+  private def trickleUp() = {
     var current = currentSize
     var par = parent(current)
     while (par != None && arr(par.get) > arr(current)) {
