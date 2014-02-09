@@ -6,6 +6,11 @@ import scala.util.Random
 
 class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
 
+  def this(x: List[T]) = {
+    this()
+    x.foreach(insert)
+  }
+  
   private var currentSize = 0
   private var arr = new Array[T](initialSize)
 
@@ -93,11 +98,11 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
 }
 
 object MinHeap extends App {
-  val mh = new MinHeap[Int]()
+  
   val rand = new Random(1)
-  val foo = Array.fill(10)(rand.nextInt(1000)).toSet.toList
-  println(foo)
-  foo.foreach(mh.insert)
+  val data = Array.fill(10)(rand.nextInt(1000)).toSet.toList
+  println(data)
+  val mh = new MinHeap[Int](data)
   
   val buffer = ArrayBuffer[Int]()
   while (!mh.isEmpty) {
