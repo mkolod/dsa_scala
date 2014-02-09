@@ -54,12 +54,12 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
       var lc = leftChild(current)
       var rc = rightChild(current)
       val child = (lc, rc) match {
-        case (Some(x), Some(y)) => Some(if (arr(x) > arr(y)) lc.get else rc.get)
+        case (Some(x), Some(y)) => Some(if (arr(x) < arr(y)) lc.get else rc.get)
         case (Some(x), None) => Some(lc.get)
         case (None, Some(y)) => Some(rc.get)
         case (None, None) => None
       }
-      if (child != None && arr(child.get) > arr(current)) {
+      if (child != None && arr(child.get) < arr(current)) {
         swap(current, child.get)
         current = child.get
       } else {
@@ -78,7 +78,7 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
   def trickleUp() = {
     var current = currentSize
     var par = parent(current)
-    while (par != None && arr(par.get) < arr(current)) {
+    while (par != None && arr(par.get) > arr(current)) {
       println(s"In while, par=$par, arr(par.get)=${arr(par.get)}, arr(current)=${arr(current)}")
       swap(par.get, current)
       current = par.get
@@ -100,7 +100,9 @@ class MinHeap[T <% Ordered[T]: Manifest](initialSize: Int = 2) {
 
 object MinHeap extends App {
   val mh = new MinHeap[Int]()
-  (1 to 10).foreach(mh.insert)
+  val foo = Array.fill(10)(scala.util.Random.nextInt(1000)).toSet.toList
+  println(foo)
+  foo.foreach(mh.insert)
   while (!mh.isEmpty) {
     println(mh.remove)
   }
