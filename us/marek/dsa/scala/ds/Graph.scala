@@ -33,11 +33,11 @@ object Graph extends App {
   println("\nBreadth-first search\n")
   graph.breadthFirstSearch(start, f)
   
-  println("\nMinimum unweighted spanning tree\n")
-  println(graph.minUnweightedSpanningTree(start))
-  
   println("\nTopological sort\n")
   println(graph.topoSort)
+  
+  println("\nMinimum unweighted spanning tree\n")
+  println(graph.minUnweightedSpanningTree(start))
   
 } // end object Graph
 
@@ -127,6 +127,13 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
      until it appears in the adjacency hash table*/
   def addVertex(v: Vertex[T]) = adjHash.put(v, LinkedHashSet.empty[Edge[T, S]])
   
+  private def copyHash(): AdjHash = {
+    val newHash = new AdjHash()
+    for (key <- adjHash.keySet) {
+      newHash(key) = adjHash(key).clone
+    }
+    newHash
+  }
   
   def minUnweightedSpanningTree(start: Vertex[T]) = {
     val edgeBuffer = new ArrayBuffer[Edge[T, S]]()
@@ -137,7 +144,7 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
   
   def topoSort: List[Vertex[T]] = {
     
-    val remaining = new AdjHash() ++ adjHash
+    val remaining = this.copyHash
     val sorted = LinkedHashSet[Vertex[T]]()
    
     def nodesWithNoSuccessors = remaining.find(_._2.isEmpty)
