@@ -10,7 +10,6 @@ object Graph extends App {
   implicit def stringToVertex(s: String) = new Vertex(s)
   
   // some test data 
-  
   val graph = new Graph[String, Option[Int]]() {
     "A,B,C,D,E,F,G".split(",").foreach(s => addVertex(s))
     addDirectedEdge("A", "B", None)  // we don't care about the weights for now, so weights = None
@@ -32,6 +31,8 @@ object Graph extends App {
   
   println("\nBreadth-first search\n")
   graph.breadthFirstSearch(start, f)
+  
+  println("\nTopological sort\n")
   println(graph.topoSort)
 } // end object Graph
 
@@ -95,6 +96,8 @@ case class Edge[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest]
     case Edge(f, t, _) => this.from == f && this.to == t
     case _ => false
   }
+  
+  override def hashCode = 31 * ((31 * from.hashCode) + to.hashCode)
 
 } // end class Edge
 
@@ -122,25 +125,34 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
   
   def topoSort: List[Vertex[T]] = {
     
-    val remaining = HashSet[Vertex[T]]() ++ adjHash.keySet
+    val remaining = adjHash.clone
     val sorted = LinkedHashSet[Vertex[T]]()
    
     println(adjHash)
     
-    def nodesWithNoSuccessors = remaining.filter(x => adjHash(x).isEmpty) match { 
-      case x if x.isEmpty => {println(x); None}
-      case x => Some(x)
+    def nodesWithNoSuccessors = {
+      println(s"remaining = $remaining")
+      remaining.find(_._2.isEmpty)
     }
-   
-    
+      
+ 
     while (!(remaining.size == 0)) {
      val x = nodesWithNoSuccessors
+     if (x == None) throw new IllegalStateException("Graph has cycles - nodes remain yet there's no node without successors")
+     val next = x.get._1
+     sorted += next
+     remaining -= next
      println(s"sorted = $sorted")
      println(s"remaining = $remaining\n")
-     if (x == None) throw new IllegalStateException("Graph has cycles - nodes remain yet there's no node without successors")
-     val next = x.get.take(1)
-     sorted ++= next
-     remaining --= next
+     remaining.foreach(tuple => {
+       val (key, value) = tuple
+       println(s"\nkey = $key, value = $value")
+       val vtx = Edge[T, S](from = key, to = next)
+       println(s"vtx = $vtx\n")
+       if (value.contains(vtx)) {
+         value -= vtx
+       } 
+     })
     }
     sorted.toList
   }
@@ -184,7 +196,6 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
   
   // accept different data structures (stack, queue) and genetate different search behavior (DFS, BFS)
   private def search(start: Vertex[T], f: Vertex[T] => Unit, collection: GraphCollection[Vertex[T]]) = {
-    println("In search... :))")
     require(adjHash.contains(start), s"starting vertex $start not in graph")
     
     val visited = new HashSet[Vertex[T]]()
