@@ -179,15 +179,14 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
     adjHash.get(from).get.remove(edge)
   }
 
-  def addUndirectedEdge(a: Vertex[T], b: Vertex[T], equiWeight: S) = {
+  def addUndirectedEdge(a: Vertex[T], b: Vertex[T], equiWeight: Option[S]) = {
     addDirectedEdge(a, b, equiWeight)
     addDirectedEdge(b, a, equiWeight)
   }
 
-  def addDirectedEdge(from: Vertex[T], to: Vertex[T], weight: S) = {
+  def addDirectedEdge(from: Vertex[T], to: Vertex[T], weight: Option[S]) = {
     require(adjHash.contains(from), s"Adjacency hash does not contain the starting vertex $from")
-    val e = Edge(from, to, Some(weight))
-    adjHash.get(from).get.add(e)
+    adjHash.get(from).get.add(Edge(from, to, weight))
   }
   
   // abstraction = :)
