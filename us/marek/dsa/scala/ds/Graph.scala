@@ -2,6 +2,7 @@ package us.marek.dsa.scala.ds
 
 // needed to rename Stack since I also have my own implementation in this package
 import scala.collection.mutable.{ HashMap, HashSet, LinkedHashSet, Stack => CStack }
+import scala.collection.mutable.ArrayBuffer
 
 
 // let's test the code
@@ -32,8 +33,12 @@ object Graph extends App {
   println("\nBreadth-first search\n")
   graph.breadthFirstSearch(start, f)
   
+  println("\nMinimum unweighted spanning tree\n")
+  println(graph.minUnweightedSpanningTree(start))
+  
   println("\nTopological sort\n")
   println(graph.topoSort)
+  
 } // end object Graph
 
 
@@ -77,7 +82,9 @@ case class GraphStack[T] extends GraphCollection[T] {
 
 /* let's get equals/hashCode/toString etc.
  get rid of type erasure and restrict to ordered types (e.g. for topo sorting, etc.) */
-case class Vertex[T <% Ordered[T]: Manifest](value: T)
+case class Vertex[T <% Ordered[T]: Manifest](value: T) {
+  override def toString = s"$value"
+}
 
 
 /* graph edges, get rid of type erasure, require ordering since vertices are ordered
@@ -98,6 +105,8 @@ case class Edge[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest]
   }
   
   override def hashCode = 31 * ((31 * from.hashCode) + to.hashCode)
+  
+  override def toString = s"($from -> $to, $weight)"
 
 } // end class Edge
 
@@ -119,36 +128,29 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
   def addVertex(v: Vertex[T]) = adjHash.put(v, LinkedHashSet.empty[Edge[T, S]])
   
   
-  def minSpanningTree() = {
-    
+  def minUnweightedSpanningTree(start: Vertex[T]) = {
+    val edgeBuffer = new ArrayBuffer[Edge[T, S]]()
+    val f = (v: Edge[T, S]) => edgeBuffer += v
+    dfsSpan(start, f)
+    edgeBuffer.toList
   }
   
   def topoSort: List[Vertex[T]] = {
     
-    val remaining = adjHash.clone
+    val remaining = new AdjHash() ++ adjHash
     val sorted = LinkedHashSet[Vertex[T]]()
    
-    println(adjHash)
-    
-    def nodesWithNoSuccessors = {
-      println(s"remaining = $remaining")
-      remaining.find(_._2.isEmpty)
-    }
+    def nodesWithNoSuccessors = remaining.find(_._2.isEmpty)
       
- 
     while (!(remaining.size == 0)) {
      val x = nodesWithNoSuccessors
      if (x == None) throw new IllegalStateException("Graph has cycles - nodes remain yet there's no node without successors")
      val next = x.get._1
      sorted += next
      remaining -= next
-     println(s"sorted = $sorted")
-     println(s"remaining = $remaining\n")
      remaining.foreach(tuple => {
        val (key, value) = tuple
-       println(s"\nkey = $key, value = $value")
        val vtx = Edge[T, S](from = key, to = next)
-       println(s"vtx = $vtx\n")
        if (value.contains(vtx)) {
          value -= vtx
        } 
@@ -190,11 +192,13 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
   }
   
   // abstraction = :)
-  def depthFirstSearch(start: Vertex[T], f: Vertex[T] => Unit) = search(start, f, new GraphStack[Vertex[T]]())
-  def breadthFirstSearch(start: Vertex[T], f: Vertex[T] => Unit) = search(start, f, new GraphQueue[Vertex[T]]())
+  def depthFirstSearch(start: Vertex[T], f1: Vertex[T] => Unit): Unit = search(start, f1, new GraphStack[Vertex[T]]())
+  private def dfsSpan[R](start: Vertex[T], f2: Edge[T, S] => R): Unit = search(start = start, collection = new GraphStack[Vertex[T]](), f2 = f2)
+  def breadthFirstSearch(start: Vertex[T], f1: Vertex[T] => Unit) = search(start, f1, new GraphQueue[Vertex[T]]())
   
   // accept different data structures (stack, queue) and genetate different search behavior (DFS, BFS)
-  private def search(start: Vertex[T], f: Vertex[T] => Unit, collection: GraphCollection[Vertex[T]]) = {
+  private def search[R](start: Vertex[T], f1: Vertex[T] => Unit = (v: Vertex[T]) => Unit,
+      collection: GraphCollection[Vertex[T]], f2: Edge[T, S] => R = (e: Edge[T, S]) => ()) = {
     require(adjHash.contains(start), s"starting vertex $start not in graph")
     
     val visited = new HashSet[Vertex[T]]()
@@ -203,16 +207,17 @@ class Graph[T <% Ordered[T]: Manifest, S <% Ordered[S]: Manifest] {
     
     collection.add(start)
     visited.add(start)
-    f(start)
+    f1(start)
     
     while (!collection.isEmpty) {
-      println(s"collection = $collection")
+     // println(s"collection = $collection")
       adjHash.get(collection.peek.get) match {
         case Some(x) => {
           val e = getUnvisited(x)
           if (e != None) {
             val v = e.get.to
-            f(v)
+            f1(v)
+            f2(e.get)
             visited.add(v)
             collection.add(v)
           } else {
